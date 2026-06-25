@@ -59,6 +59,50 @@ export async function getReleaseDates(limit: string = "10") {
   return fredGet("releases/dates", { limit });
 }
 
+
+
+export async function getTags(limit: string = "50", search: string = "") {
+  const params: Record<string, string> = { limit };
+  if (search) params.search_text = search;
+  return fredGet("tags", params);
+}
+
+export async function getTagSeries(tag: string, limit: string = "20") {
+  return fredGet("tags/series", { tag_names: tag, limit, sort_order: "popularity" });
+}
+
+export async function getReleaseSeries(releaseId: string, limit: string = "20") {
+  return fredGet("release/series", { release_id: releaseId, limit });
+}
+
+export async function getReleaseDatesForRelease(releaseId: string, limit: string = "10") {
+  return fredGet("release/dates", { release_id: releaseId, limit });
+}
+
+export async function getCategoryTags(categoryId: string) {
+  return fredGet("category/tags", { category_id: categoryId });
+}
+
+export async function getSeriesTags(seriesId: string) {
+  return fredGet("series/tags", { series_id: seriesId });
+}
+
+export async function searchTags(query: string, limit: string = "20") {
+  return fredGet("series/search/tags", { search_text: query, limit });
+}
+
+export async function getRelatedSeries(seriesId: string) {
+  return fredGet("series/categories", { series_id: seriesId });
+}
+
+export async function getSources() {
+  return fredGet("sources", {});
+}
+
+export async function getVintageDates(seriesId: string, limit: string = "10") {
+  return fredGet("series/vintagedates", { series_id: seriesId, limit });
+}
+
 export const POPULAR_SERIES: Record<string, { id: string; name: string; unit: string }> = {
   gdp: { id: "GDP", name: "Gross Domestic Product", unit: "Billions of Dollars" },
   unemployment: { id: "UNRATE", name: "Unemployment Rate", unit: "Percent" },

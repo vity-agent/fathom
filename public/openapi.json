@@ -3,24 +3,44 @@
   "info": {
     "title": "Fathom",
     "version": "1.0.0",
-    "description": "Free macroeconomic data API powered by FRED (Federal Reserve Economic Data). 816,000+ time series covering GDP, inflation, employment, interest rates, money supply, and more.",
-    "x-guidance": "Use /api/popular to discover available indicators. Use /api/search?q=keyword to find specific series. Use /api/observations/{seriesId} to fetch data values. Series IDs are uppercase codes like GDP, UNRATE, CPIAUCSL, FEDFUNDS, DGS10.",
-    "contact": { "email": "admin@orbonomy.xyz" },
-    "x-logo": { "url": "https://fathom.vercel.app/favicon.png" }
+    "description": "Macroeconomic data API powered by FRED (Federal Reserve Economic Data). 816,000+ time series covering GDP, inflation, employment, interest rates, money supply, and more.",
+    "x-guidance": "Use /api/popular to discover available indicators. Use /api/search to find specific series by keyword. Use /api/observations to fetch data values. Use /api/snapshot for a dashboard overview. Use /api/compare to compare multiple series. Series IDs are uppercase codes like GDP, UNRATE, CPIAUCSL, FEDFUNDS, DGS10.",
+    "contact": {
+      "email": "admin@orbonomy.xyz"
+    },
+    "x-logo": {
+      "url": "https://fathom.vercel.app/favicon.png"
+    }
   },
-  "servers": [{ "url": "https://fathom.vercel.app" }],
+  "servers": [
+    {
+      "url": "https://fathom.vercel.app"
+    }
+  ],
   "paths": {
     "/api/observations": {
       "post": {
-        "operationId": "getObservations",
+        "operationId": "observations",
         "summary": "Get economic data observations",
-        "description": "Fetch data values for any FRED economic series. Use series IDs like GDP, UNRATE, CPIAUCSL, FEDFUNDS, DGS10, SP500, etc.",
-        "tags": ["Data"],
+        "description": "Fetch data values for any FRED economic series. Use series IDs like GDP, UNRATE, CPIAUCSL, FEDFUNDS, DGS10.",
+        "tags": [
+          "Data"
+        ],
         "security": [],
         "x-payment-info": {
-          "price": { "mode": "fixed", "currency": "USD", "amount": "0.030000" },
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.030000"
+          },
           "protocols": [
-            { "x402": { "version": 2, "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "network": "eip155:8453" } }
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
           ]
         },
         "requestBody": {
@@ -30,59 +50,103 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "seriesId": { "type": "string", "minLength": 1, "description": "FRED series ID (e.g. GDP, UNRATE, CPIAUCSL)" },
-                  "limit": { "type": "string", "description": "Max observations to return (default: 10)" },
-                  "sort": { "type": "string", "enum": ["asc", "desc"], "description": "Sort order (default: desc)" },
-                  "start": { "type": "string", "description": "Start date YYYY-MM-DD" },
-                  "end": { "type": "string", "description": "End date YYYY-MM-DD" }
+                  "seriesId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED series ID (e.g. GDP, UNRATE, CPIAUCSL)"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Max observations (default: 10)"
+                  },
+                  "sort": {
+                    "type": "string",
+                    "description": "Sort order: asc or desc (default: desc)"
+                  },
+                  "start": {
+                    "type": "string",
+                    "description": "Start date YYYY-MM-DD"
+                  },
+                  "end": {
+                    "type": "string",
+                    "description": "End date YYYY-MM-DD"
+                  },
+                  "units": {
+                    "type": "string",
+                    "description": "Units transformation (lin, chg, ch1, pch, pca, cch, cca, log)"
+                  },
+                  "frequency": {
+                    "type": "string",
+                    "description": "Frequency (d, w, bw, m, q, sa, a)"
+                  }
                 },
-                "required": ["seriesId"]
+                "required": [
+                  "seriesId"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Economic data observations",
+            "description": "Get economic data observations",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "source": { "type": "string" },
-                    "series_id": { "type": "string" },
-                    "count": { "type": "number" },
+                    "source": {
+                      "type": "string"
+                    },
+                    "series_id": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "number"
+                    },
                     "observations": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "date": { "type": "string" },
-                          "value": { "type": "string" }
-                        }
+                        "type": "object"
                       }
                     }
                   },
-                  "required": ["source", "series_id", "observations"]
+                  "required": [
+                    "source"
+                  ]
                 }
               }
             }
           },
-          "402": { "description": "Payment Required" }
+          "402": {
+            "description": "Payment Required"
+          }
         }
       }
     },
     "/api/search": {
       "post": {
-        "operationId": "searchSeries",
+        "operationId": "search",
         "summary": "Search economic time series",
-        "description": "Search across 816,000+ FRED economic time series by keyword. Returns matching series with metadata.",
-        "tags": ["Discovery"],
+        "description": "Search across 816,000+ FRED economic time series by keyword.",
+        "tags": [
+          "Discovery"
+        ],
         "security": [],
         "x-payment-info": {
-          "price": { "mode": "fixed", "currency": "USD", "amount": "0.020000" },
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
           "protocols": [
-            { "x402": { "version": 2, "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "network": "eip155:8453" } }
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
           ]
         },
         "requestBody": {
@@ -92,59 +156,83 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "query": { "type": "string", "minLength": 1, "description": "Search keywords (e.g. 'inflation rate', 'housing starts')" },
-                  "limit": { "type": "string", "description": "Max results (default: 10)" }
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Search keywords (e.g. 'inflation rate', 'housing starts')"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 10)"
+                  }
                 },
-                "required": ["query"]
+                "required": [
+                  "query"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Search results",
+            "description": "Search economic time series",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "source": { "type": "string" },
-                    "query": { "type": "string" },
-                    "count": { "type": "number" },
+                    "source": {
+                      "type": "string"
+                    },
+                    "query": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "number"
+                    },
                     "series": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": { "type": "string" },
-                          "title": { "type": "string" },
-                          "units": { "type": "string" },
-                          "frequency": { "type": "string" },
-                          "popularity": { "type": "number" }
-                        }
+                        "type": "object"
                       }
                     }
                   },
-                  "required": ["source", "query", "series"]
+                  "required": [
+                    "source"
+                  ]
                 }
               }
             }
           },
-          "402": { "description": "Payment Required" }
+          "402": {
+            "description": "Payment Required"
+          }
         }
       }
     },
     "/api/series": {
       "post": {
-        "operationId": "getSeriesInfo",
+        "operationId": "series",
         "summary": "Get series metadata",
-        "description": "Get detailed metadata for a specific FRED series including title, units, frequency, date range, and popularity.",
-        "tags": ["Metadata"],
+        "description": "Get detailed metadata for a specific FRED series: title, units, frequency, date range, popularity.",
+        "tags": [
+          "Metadata"
+        ],
         "security": [],
         "x-payment-info": {
-          "price": { "mode": "fixed", "currency": "USD", "amount": "0.020000" },
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
           "protocols": [
-            { "x402": { "version": 2, "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "network": "eip155:8453" } }
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
           ]
         },
         "requestBody": {
@@ -154,45 +242,73 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "seriesId": { "type": "string", "minLength": 1, "description": "FRED series ID (e.g. GDP, UNRATE)" }
+                  "seriesId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED series ID (e.g. GDP, UNRATE)"
+                  }
                 },
-                "required": ["seriesId"]
+                "required": [
+                  "seriesId"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Series metadata",
+            "description": "Get series metadata",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "source": { "type": "string" },
-                    "seriesId": { "type": "string" },
-                    "info": { "type": "object" }
+                    "source": {
+                      "type": "string"
+                    },
+                    "seriesId": {
+                      "type": "string"
+                    },
+                    "info": {
+                      "type": "object"
+                    }
                   },
-                  "required": ["source", "seriesId"]
+                  "required": [
+                    "source"
+                  ]
                 }
               }
             }
           },
-          "402": { "description": "Payment Required" }
+          "402": {
+            "description": "Payment Required"
+          }
         }
       }
     },
     "/api/categories": {
       "post": {
-        "operationId": "getCategories",
+        "operationId": "categories",
         "summary": "Browse data categories",
-        "description": "Browse FRED data categories. Top-level categories include National Accounts, Production & Business Activity, Prices, Employment, Money & Banking, etc.",
-        "tags": ["Discovery"],
+        "description": "Browse FRED data categories: National Accounts, Prices, Employment, Money & Banking, etc.",
+        "tags": [
+          "Discovery"
+        ],
         "security": [],
         "x-payment-info": {
-          "price": { "mode": "fixed", "currency": "USD", "amount": "0.010000" },
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
           "protocols": [
-            { "x402": { "version": 2, "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "network": "eip155:8453" } }
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
           ]
         },
         "requestBody": {
@@ -202,7 +318,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "categoryId": { "type": "string", "description": "Category ID (default: 0 for top-level)" }
+                  "categoryId": {
+                    "type": "string",
+                    "description": "Category ID (default: 0 for top-level)"
+                  }
                 }
               }
             }
@@ -210,78 +329,128 @@
         },
         "responses": {
           "200": {
-            "description": "Category listing",
+            "description": "Browse data categories",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "source": { "type": "string" },
-                    "category_id": { "type": "string" },
-                    "categories": { "type": "array", "items": { "type": "object" } }
+                    "source": {
+                      "type": "string"
+                    },
+                    "category_id": {
+                      "type": "string"
+                    },
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
                   },
-                  "required": ["source", "categories"]
+                  "required": [
+                    "source"
+                  ]
                 }
               }
             }
           },
-          "402": { "description": "Payment Required" }
+          "402": {
+            "description": "Payment Required"
+          }
         }
       }
     },
     "/api/popular": {
       "post": {
-        "operationId": "getPopularSeries",
+        "operationId": "popular",
         "summary": "Popular economic indicators",
-        "description": "Returns 20 most-watched macroeconomic indicators with their FRED series IDs, names, and units. Good starting point for discovering data.",
-        "tags": ["Discovery"],
+        "description": "20 most-watched macroeconomic indicators with FRED series IDs, names, and units.",
+        "tags": [
+          "Discovery"
+        ],
         "security": [],
         "x-payment-info": {
-          "price": { "mode": "fixed", "currency": "USD", "amount": "0.010000" },
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
           "protocols": [
-            { "x402": { "version": 2, "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "network": "eip155:8453" } }
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
           ]
         },
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "type": "object", "properties": {} }
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Popular indicators",
+            "description": "Popular economic indicators",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "source": { "type": "string" },
-                    "count": { "type": "number" },
-                    "series": { "type": "object" }
+                    "source": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "number"
+                    },
+                    "series": {
+                      "type": "object"
+                    }
                   },
-                  "required": ["source", "count", "series"]
+                  "required": [
+                    "source"
+                  ]
                 }
               }
             }
           },
-          "402": { "description": "Payment Required" }
+          "402": {
+            "description": "Payment Required"
+          }
         }
       }
     },
     "/api/releases": {
       "post": {
-        "operationId": "getReleases",
+        "operationId": "releases",
         "summary": "Data release schedule",
-        "description": "Get upcoming Federal Reserve economic data releases. Use dates=true for release dates only.",
-        "tags": ["Metadata"],
+        "description": "Upcoming Federal Reserve economic data releases.",
+        "tags": [
+          "Metadata"
+        ],
         "security": [],
         "x-payment-info": {
-          "price": { "mode": "fixed", "currency": "USD", "amount": "0.020000" },
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
           "protocols": [
-            { "x402": { "version": 2, "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "network": "eip155:8453" } }
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
           ]
         },
         "requestBody": {
@@ -291,8 +460,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "limit": { "type": "string", "description": "Max results (default: 20)" },
-                  "dates": { "type": "boolean", "description": "If true, return release dates only" }
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 20)"
+                  },
+                  "dates": {
+                    "type": "boolean",
+                    "description": "If true, return dates only"
+                  }
                 }
               }
             }
@@ -300,21 +475,1355 @@
         },
         "responses": {
           "200": {
-            "description": "Release schedule",
+            "description": "Data release schedule",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "source": { "type": "string" },
-                    "releases": { "type": "array", "items": { "type": "object" } }
+                    "source": {
+                      "type": "string"
+                    },
+                    "releases": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
                   },
-                  "required": ["source"]
+                  "required": [
+                    "source"
+                  ]
                 }
               }
             }
           },
-          "402": { "description": "Payment Required" }
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/category-series": {
+      "post": {
+        "operationId": "categoryseries",
+        "summary": "Series in a category",
+        "description": "List economic data series within a specific FRED category, sorted by popularity.",
+        "tags": [
+          "Discovery"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "categoryId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED category ID"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 20)"
+                  }
+                },
+                "required": [
+                  "categoryId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Series in a category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "category_id": {
+                      "type": "string"
+                    },
+                    "series": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/tags": {
+      "post": {
+        "operationId": "tags",
+        "summary": "Browse tags",
+        "description": "Browse all FRED tags. Tags describe data attributes like 'monthly', 'gdp', 'inflation', 'nsa'.",
+        "tags": [
+          "Discovery"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 50)"
+                  },
+                  "search": {
+                    "type": "string",
+                    "description": "Filter tags by keyword"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Browse tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/tag-series": {
+      "post": {
+        "operationId": "tagseries",
+        "summary": "Series by tag",
+        "description": "Find economic data series matching a specific tag (e.g. 'gdp', 'monthly', 'inflation').",
+        "tags": [
+          "Discovery"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Tag name (e.g. gdp, monthly, inflation, nsa)"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 20)"
+                  }
+                },
+                "required": [
+                  "tag"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Series by tag",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "tag": {
+                      "type": "string"
+                    },
+                    "series": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/release-series": {
+      "post": {
+        "operationId": "releaseseries",
+        "summary": "Series in a release",
+        "description": "List all economic data series within a specific FRED data release.",
+        "tags": [
+          "Metadata"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "releaseId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED release ID"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 20)"
+                  }
+                },
+                "required": [
+                  "releaseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Series in a release",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "release_id": {
+                      "type": "string"
+                    },
+                    "series": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/release-dates": {
+      "post": {
+        "operationId": "releasedates",
+        "summary": "Release dates",
+        "description": "Get specific release dates for a FRED data release.",
+        "tags": [
+          "Metadata"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "releaseId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED release ID"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 10)"
+                  }
+                },
+                "required": [
+                  "releaseId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Release dates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "release_id": {
+                      "type": "string"
+                    },
+                    "dates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/bulk": {
+      "post": {
+        "operationId": "bulk",
+        "summary": "Multi-series fetch",
+        "description": "Fetch observations for multiple FRED series in one call. Returns latest values for each.",
+        "tags": [
+          "Data"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.050000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "seriesIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of FRED series IDs (e.g. ['GDP', 'UNRATE', 'CPIAUCSL'])"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Observations per series (default: 5)"
+                  }
+                },
+                "required": [
+                  "seriesIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Multi-series fetch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "results": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/compare": {
+      "post": {
+        "operationId": "compare",
+        "summary": "Compare series",
+        "description": "Compare 2-5 economic series side by side with latest values and recent trends.",
+        "tags": [
+          "Intelligence"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.050000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "seriesIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of 2-5 FRED series IDs to compare"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Observations per series (default: 10)"
+                  }
+                },
+                "required": [
+                  "seriesIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compare series",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "comparison": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/latest": {
+      "post": {
+        "operationId": "latest",
+        "summary": "Latest values",
+        "description": "Get the most recent observation value for a FRED series.",
+        "tags": [
+          "Data"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "seriesId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED series ID"
+                  }
+                },
+                "required": [
+                  "seriesId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Latest values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "series_id": {
+                      "type": "string"
+                    },
+                    "latest": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/calendar": {
+      "post": {
+        "operationId": "calendar",
+        "summary": "Economic calendar",
+        "description": "Upcoming economic data release calendar with dates and release names.",
+        "tags": [
+          "Discovery"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.030000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 15)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Economic calendar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "events": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/snapshot": {
+      "post": {
+        "operationId": "snapshot",
+        "summary": "Economic dashboard",
+        "description": "Dashboard snapshot of key US economic indicators: GDP, unemployment, CPI, Fed Funds rate, 10Y Treasury, S&P 500.",
+        "tags": [
+          "Intelligence"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.050000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Economic dashboard",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "snapshot": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/sources": {
+      "post": {
+        "operationId": "sources",
+        "summary": "Data sources",
+        "description": "List all FRED data sources (Federal Reserve, BLS, Census, BEA, etc.).",
+        "tags": [
+          "Metadata"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data sources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "sources": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/category-tags": {
+      "post": {
+        "operationId": "categorytags",
+        "summary": "Tags for a category",
+        "description": "Get all tags associated with a FRED data category.",
+        "tags": [
+          "Metadata"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "categoryId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED category ID"
+                  }
+                },
+                "required": [
+                  "categoryId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tags for a category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "category_id": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/series-tags": {
+      "post": {
+        "operationId": "seriestags",
+        "summary": "Tags for a series",
+        "description": "Get all tags associated with a specific FRED series.",
+        "tags": [
+          "Metadata"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "seriesId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED series ID"
+                  }
+                },
+                "required": [
+                  "seriesId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tags for a series",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "series_id": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/search-tags": {
+      "post": {
+        "operationId": "searchtags",
+        "summary": "Search tags",
+        "description": "Search FRED tags by keyword.",
+        "tags": [
+          "Discovery"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Search keyword"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 20)"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "query": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/vintage": {
+      "post": {
+        "operationId": "vintage",
+        "summary": "Vintage dates",
+        "description": "Get vintage/revision dates for a FRED series. Shows when data was revised.",
+        "tags": [
+          "Metadata"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.020000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "seriesId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED series ID"
+                  },
+                  "limit": {
+                    "type": "string",
+                    "description": "Max results (default: 10)"
+                  }
+                },
+                "required": [
+                  "seriesId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vintage dates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "series_id": {
+                      "type": "string"
+                    },
+                    "vintage_dates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/related": {
+      "post": {
+        "operationId": "related",
+        "summary": "Related categories",
+        "description": "Get categories related to a specific FRED economic data series.",
+        "tags": [
+          "Metadata"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "seriesId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "FRED series ID"
+                  }
+                },
+                "required": [
+                  "seriesId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Related categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "series_id": {
+                      "type": "string"
+                    },
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
+        }
+      }
+    },
+    "/api/category-tree": {
+      "post": {
+        "operationId": "categorytree",
+        "summary": "Category tree",
+        "description": "Get child categories for a parent FRED category. Walk the category tree.",
+        "tags": [
+          "Discovery"
+        ],
+        "security": [],
+        "x-payment-info": {
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.010000"
+          },
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "network": "eip155:8453"
+              }
+            }
+          ]
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "categoryId": {
+                    "type": "string",
+                    "description": "Parent category ID (default: 0 for root)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category tree",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "parent_id": {
+                      "type": "string"
+                    },
+                    "children": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required"
+          }
         }
       }
     }

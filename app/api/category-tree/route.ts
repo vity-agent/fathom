@@ -4,9 +4,9 @@ import { getCategories } from "@/lib/fred";
 export async function GET(req: NextRequest) {
   try {
     const sp = req.nextUrl.searchParams;
-        const id = sp.get("id") || "0"
-    const data = await getCategories(id);
-    return NextResponse.json({ source: "FRED", category_id: id, categories: data.categories || [] });
+        const categoryId = sp.get("categoryId") || sp.get("id") || "0" || "0"
+    const data = await getCategories(categoryId);
+    return NextResponse.json({ source: "FRED", parent_id: categoryId, children: data.categories || [] });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -15,9 +15,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-        const id = body.categoryId || body.id || "0"
-    const data = await getCategories(id);
-    return NextResponse.json({ source: "FRED", category_id: id, categories: data.categories || [] });
+        const categoryId = body.categoryId || body.id || "0"
+    const data = await getCategories(categoryId);
+    return NextResponse.json({ source: "FRED", parent_id: categoryId, children: data.categories || [] });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

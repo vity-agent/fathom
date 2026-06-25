@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCategories } from "@/lib/fred";
+import { getReleaseDates } from "@/lib/fred";
 
 export async function GET(req: NextRequest) {
   try {
     const sp = req.nextUrl.searchParams;
-        const id = sp.get("id") || "0"
-    const data = await getCategories(id);
-    return NextResponse.json({ source: "FRED", category_id: id, categories: data.categories || [] });
+        const limit = sp.get("limit") || "15"
+    const data = await getReleaseDates(limit);
+    return NextResponse.json({ source: "FRED", events: data.release_dates || [] });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -15,9 +15,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-        const id = body.categoryId || body.id || "0"
-    const data = await getCategories(id);
-    return NextResponse.json({ source: "FRED", category_id: id, categories: data.categories || [] });
+        const limit = body.limit || "15"
+    const data = await getReleaseDates(limit);
+    return NextResponse.json({ source: "FRED", events: data.release_dates || [] });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

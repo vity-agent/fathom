@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSeriesInfo } from "@/lib/fred";
+import { getSeriesTags } from "@/lib/fred";
 
 export async function GET(req: NextRequest) {
   try {
     const sp = req.nextUrl.searchParams;
-        const seriesId = sp.get("seriesId") || sp.get("id") || "GDP" || "GDP"
-    const data = await getSeriesInfo(seriesId);
-    return NextResponse.json({ source: "FRED", seriesId, info: (data.series || [])[0] || null });
+        const seriesId = sp.get("seriesId") || sp.get("id") || "GDP"
+    const data = await getSeriesTags(seriesId);
+    return NextResponse.json({ source: "FRED", series_id: seriesId, tags: data.tags || [] });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
         const seriesId = body.seriesId || body.id
     if (!seriesId) return NextResponse.json({ error: "Series ID is required" }, { status: 400 })
-    const data = await getSeriesInfo(seriesId);
-    return NextResponse.json({ source: "FRED", seriesId, info: (data.series || [])[0] || null });
+    const data = await getSeriesTags(seriesId);
+    return NextResponse.json({ source: "FRED", series_id: seriesId, tags: data.tags || [] });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
