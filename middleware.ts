@@ -87,19 +87,22 @@ export async function middleware(request: NextRequest) {
   const host = BASE_URL.replace(/^https?:\/\//, "");
 
   // Build payment requirements for PAYMENT-REQUIRED header (base64-encoded)
+  const acceptEntry = {
+    scheme: "exact",
+    network: NETWORK,
+    asset: USDC_ASSET,
+    amount: amountInBaseUnits,
+    maxAmountRequired: amountInBaseUnits,
+    resource: `${BASE_URL}${pathname}`,
+    description: route.description,
+    mimeType: "application/json",
+    payTo: PAYEE,
+    maxTimeoutSeconds: 60,
+  };
+
   const paymentRequired = {
     x402Version: 2,
-    accepts: [{
-      scheme: "exact",
-      network: NETWORK,
-      asset: USDC_ASSET,
-      maxAmountRequired: amountInBaseUnits,
-      resource: `${BASE_URL}${pathname}`,
-      description: route.description,
-      mimeType: "application/json",
-      payTo: PAYEE,
-      maxTimeoutSeconds: 60,
-    }],
+    accepts: [acceptEntry],
     resource: {
       url: `${BASE_URL}${pathname}`,
       description: route.description,
@@ -109,7 +112,7 @@ export async function middleware(request: NextRequest) {
 
   const x402v2Body = {
     x402Version: 2,
-    accepts: paymentRequired.accepts,
+    accepts: [acceptEntry],
     paymentProtocol: "x402",
   };
 
