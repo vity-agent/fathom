@@ -1,14 +1,15 @@
 // Fathom — Custom x402 middleware
-// Returns 402 with x402 v2 JSON body + PAYMENT-REQUIRED header for all paid routes
+// Returns 402 with IETF Payment challenge + x402 v2 body
 // Wallet: 0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes, createHmac } from "crypto";
 
-// BASE_URL derived from request in handler
 const PAYEE = process.env.PAY_TO_ADDRESS || "0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86";
 const NETWORK = process.env.NETWORK || "eip155:8453";
 const FACILITATOR_URL = process.env.FACILITATOR_URL || "https://facilitator.payai.network";
 const USDC_ASSET = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+const CHALLENGE_SECRET = process.env.CHALLENGE_SECRET || "fathom-x402-challenge-secret";
 
 const ROUTES: Record<string, { price: string; description: string }> = {
   "/api/observations": { price: "0.06", description: "Get economic data observations for any FRED series" },
@@ -36,17 +37,19 @@ const ROUTES: Record<string, { price: string; description: string }> = {
   "/api/category-tree": { price: "0.04", description: "Browse FRED category tree" },
 };
 
+function base64url(buf: Buffer): string {
+  return buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const BASE_URL = request.nextUrl.origin;
   const route = ROUTES[pathname];
   if (!route) return NextResponse.next();
 
-  // Check for payment header (x402 v2)
   const paymentHeader = request.headers.get("Payment") || request.headers.get("X-Payment") || request.headers.get("payment-signature");
 
   if (paymentHeader) {
-    // Verify payment with facilitator
     try {
       const amountInBaseUnits = Math.round(parseFloat(route.price) * 1_000_000).toString();
       const requirements = {
@@ -68,7 +71,6 @@ export async function middleware(request: NextRequest) {
       if (verifyResp.ok) {
         const result = await verifyResp.json();
         if (result.isValid) {
-          // Settle in background
           fetch(`${FACILITATOR_URL}/settle`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -82,11 +84,34 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // No valid payment — return 402 with x402 v2 body + PAYMENT-REQUIRED header
+  // Build 402 response
   const amountInBaseUnits = Math.round(parseFloat(route.price) * 1_000_000).toString();
   const host = BASE_URL.replace(/^https?:\/\//, "");
 
-  // Build payment requirements for PAYMENT-REQUIRED header (base64-encoded)
+  // Generate challenge ID (HMAC-bound to parameters)
+  const expires = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  const requestPayload = {
+    scheme: "exact",
+    network: NETWORK,
+    asset: USDC_ASSET,
+    amount: amountInBaseUnits,
+    maxAmountRequired: amountInBaseUnits,
+    resource: `${BASE_URL}${pathname}`,
+    description: route.description,
+    mimeType: "application/json",
+    payTo: PAYEE,
+    maxTimeoutSeconds: 60,
+  };
+  const requestB64 = base64url(Buffer.from(JSON.stringify(requestPayload)));
+
+  // HMAC-SHA256 binding: id = HMAC(secret, method|intent|realm|request|expires)
+  const bindingInput = `x402|charge|${host}|${requestB64}|${expires}`;
+  const challengeId = createHmac("sha256", CHALLENGE_SECRET).update(bindingInput).digest("hex").slice(0, 24);
+
+  // IETF Payment challenge in WWW-Authenticate
+  const wwwAuthenticate = `Payment id="${challengeId}", realm="${host}", method="x402", intent="charge", expires="${expires}", request="${requestB64}"`;
+
+  // x402 v2 body (for x402scan compatibility)
   const acceptEntry = {
     scheme: "exact",
     network: NETWORK,
@@ -100,6 +125,12 @@ export async function middleware(request: NextRequest) {
     maxTimeoutSeconds: 60,
   };
 
+  const x402v2Body = {
+    x402Version: 2,
+    accepts: [acceptEntry],
+    paymentProtocol: "x402",
+  };
+
   const paymentRequired = {
     x402Version: 2,
     accepts: [acceptEntry],
@@ -110,13 +141,6 @@ export async function middleware(request: NextRequest) {
     },
   };
 
-  const x402v2Body = {
-    x402Version: 2,
-    accepts: [acceptEntry],
-    paymentProtocol: "x402",
-  };
-
-  // Base64-encode for PAYMENT-REQUIRED header
   const encodedPaymentRequired = Buffer.from(JSON.stringify(paymentRequired)).toString("base64");
 
   return new NextResponse(JSON.stringify(x402v2Body), {
@@ -124,12 +148,7 @@ export async function middleware(request: NextRequest) {
     headers: {
       "Content-Type": "application/json",
       "PAYMENT-REQUIRED": encodedPaymentRequired,
-      "X-Payment-Required": amountInBaseUnits,
-      "X-Payment-Network": NETWORK,
-      "X-Payment-Asset": USDC_ASSET,
-      "X-Payment-PayTo": PAYEE,
-      "X-Payment-Resource": `${BASE_URL}${pathname}`,
-      "WWW-Authenticate": `Payment realm="${host}", version="2", network="${NETWORK}", asset="${USDC_ASSET}", payee="${PAYEE}", amount="${amountInBaseUnits}", resource="${pathname}"`,
+      "WWW-Authenticate": wwwAuthenticate,
     },
   });
 }
