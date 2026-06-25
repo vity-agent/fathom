@@ -137,7 +137,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.020000"
+            "amount": "0.040000"
           },
           "protocols": [
             {
@@ -223,7 +223,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.020000"
+            "amount": "0.040000"
           },
           "protocols": [
             {
@@ -299,7 +299,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
@@ -374,7 +374,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
@@ -441,7 +441,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.020000"
+            "amount": "0.040000"
           },
           "protocols": [
             {
@@ -517,7 +517,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.020000"
+            "amount": "0.040000"
           },
           "protocols": [
             {
@@ -600,7 +600,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
@@ -676,7 +676,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.020000"
+            "amount": "0.040000"
           },
           "protocols": [
             {
@@ -759,7 +759,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.020000"
+            "amount": "0.040000"
           },
           "protocols": [
             {
@@ -842,7 +842,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.020000"
+            "amount": "0.040000"
           },
           "protocols": [
             {
@@ -1295,7 +1295,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
@@ -1362,7 +1362,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
@@ -1441,7 +1441,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
@@ -1520,7 +1520,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
@@ -1603,7 +1603,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.020000"
+            "amount": "0.040000"
           },
           "protocols": [
             {
@@ -1686,7 +1686,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
@@ -1765,7 +1765,7 @@
           "price": {
             "mode": "fixed",
             "currency": "USD",
-            "amount": "0.010000"
+            "amount": "0.020000"
           },
           "protocols": [
             {
