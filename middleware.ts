@@ -1,141 +1,118 @@
-// Fathom — x402 payment proxy
+// Fathom — Custom x402 middleware
+// Returns 402 with x402 v2 JSON body for all paid routes
 // Wallet: 0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86
-// Chain: Base Mainnet (eip155:8453)
-// Facilitator: PayAI
 
-import { paymentProxy } from "@x402/next";
-import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
-import { ExactEvmScheme } from "@x402/evm/exact/server";
+import { NextRequest, NextResponse } from "next/server";
 
-const WALLET_ADDRESS = process.env.PAY_TO_ADDRESS || "0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86";
+const BASE_URL = process.env.BASE_URL || "https://fathom.vercel.app";
+const PAYEE = process.env.PAY_TO_ADDRESS || "0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86";
+const NETWORK = process.env.NETWORK || "eip155:8453";
 const FACILITATOR_URL = process.env.FACILITATOR_URL || "https://facilitator.payai.network";
-const NETWORK = (process.env.NETWORK || "eip155:8453") as "eip155:8453";
+const USDC_ASSET = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
-const facilitatorClient = new HTTPFacilitatorClient({ url: FACILITATOR_URL });
-const server = new x402ResourceServer(facilitatorClient);
-server.register(NETWORK, new ExactEvmScheme());
+const ROUTES: Record<string, { price: string; description: string }> = {
+  "/api/observations": { price: "0.06", description: "Get economic data observations for any FRED series" },
+  "/api/search": { price: "0.06", description: "Search 816,000+ FRED economic time series" },
+  "/api/series": { price: "0.06", description: "Get FRED series metadata" },
+  "/api/categories": { price: "0.04", description: "Browse FRED data categories" },
+  "/api/popular": { price: "0.04", description: "20 most-watched macroeconomic indicators" },
+  "/api/releases": { price: "0.06", description: "Federal Reserve data release schedule" },
+  "/api/category-series": { price: "0.06", description: "Series within a FRED category" },
+  "/api/tags": { price: "0.04", description: "Browse FRED data tags" },
+  "/api/tag-series": { price: "0.06", description: "Series matching a tag" },
+  "/api/release-series": { price: "0.06", description: "Series within a data release" },
+  "/api/release-dates": { price: "0.06", description: "Release dates for a FRED release" },
+  "/api/bulk": { price: "0.15", description: "Multi-series fetch in one call" },
+  "/api/compare": { price: "0.15", description: "Compare 2-5 series side by side" },
+  "/api/latest": { price: "0.04", description: "Latest value for a FRED series" },
+  "/api/calendar": { price: "0.08", description: "Economic release calendar" },
+  "/api/snapshot": { price: "0.20", description: "Dashboard of 10 key US economic indicators" },
+  "/api/sources": { price: "0.04", description: "FRED data sources list" },
+  "/api/category-tags": { price: "0.04", description: "Tags for a FRED category" },
+  "/api/series-tags": { price: "0.04", description: "Tags for a FRED series" },
+  "/api/search-tags": { price: "0.04", description: "Search FRED tags" },
+  "/api/vintage": { price: "0.06", description: "Vintage/revision dates for a series" },
+  "/api/related": { price: "0.04", description: "Related categories for a series" },
+  "/api/category-tree": { price: "0.04", description: "Browse FRED category tree" },
+};
 
-const _proxy = paymentProxy(
-{
-  "/api/observations": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Fetch data values for any FRED economic series. Use series IDs like GDP, UNRATE, CPIAUCSL, FEDFUNDS, DGS10.",
-    mimeType: "application/json",
-  },
-  "/api/search": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Search across 816,000+ FRED economic time series by keyword.",
-    mimeType: "application/json",
-  },
-  "/api/series": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Get detailed metadata for a specific FRED series: title, units, frequency, date range, popularity.",
-    mimeType: "application/json",
-  },
-  "/api/categories": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Browse FRED data categories: National Accounts, Prices, Employment, Money & Banking, etc.",
-    mimeType: "application/json",
-  },
-  "/api/popular": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "20 most-watched macroeconomic indicators with FRED series IDs, names, and units.",
-    mimeType: "application/json",
-  },
-  "/api/releases": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Upcoming Federal Reserve economic data releases.",
-    mimeType: "application/json",
-  },
-  "/api/category-series": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "List economic data series within a specific FRED category, sorted by popularity.",
-    mimeType: "application/json",
-  },
-  "/api/tags": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Browse all FRED tags. Tags describe data attributes like 'monthly', 'gdp', 'inflation', 'nsa'.",
-    mimeType: "application/json",
-  },
-  "/api/tag-series": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Find economic data series matching a specific tag (e.g. 'gdp', 'monthly', 'inflation').",
-    mimeType: "application/json",
-  },
-  "/api/release-series": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "List all economic data series within a specific FRED data release.",
-    mimeType: "application/json",
-  },
-  "/api/release-dates": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Get specific release dates for a FRED data release.",
-    mimeType: "application/json",
-  },
-  "/api/bulk": {
-    accepts: [{ scheme: "exact", price: "$0.15", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Fetch observations for multiple FRED series in one call. Returns latest values for each.",
-    mimeType: "application/json",
-  },
-  "/api/compare": {
-    accepts: [{ scheme: "exact", price: "$0.15", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Compare 2-5 economic series side by side with latest values and recent trends.",
-    mimeType: "application/json",
-  },
-  "/api/latest": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Get the most recent observation value for a FRED series.",
-    mimeType: "application/json",
-  },
-  "/api/calendar": {
-    accepts: [{ scheme: "exact", price: "$0.08", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Upcoming economic data release calendar with dates and release names.",
-    mimeType: "application/json",
-  },
-  "/api/snapshot": {
-    accepts: [{ scheme: "exact", price: "$0.20", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Dashboard snapshot of key US economic indicators: GDP, unemployment, CPI, Fed Funds rate, 10Y Treasury, S&P 500.",
-    mimeType: "application/json",
-  },
-  "/api/sources": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "List all FRED data sources (Federal Reserve, BLS, Census, BEA, etc.).",
-    mimeType: "application/json",
-  },
-  "/api/category-tags": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Get all tags associated with a FRED data category.",
-    mimeType: "application/json",
-  },
-  "/api/series-tags": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Get all tags associated with a specific FRED series.",
-    mimeType: "application/json",
-  },
-  "/api/search-tags": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Search FRED tags by keyword.",
-    mimeType: "application/json",
-  },
-  "/api/vintage": {
-    accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Get vintage/revision dates for a FRED series. Shows when data was revised.",
-    mimeType: "application/json",
-  },
-  "/api/related": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Get categories related to a specific FRED economic data series.",
-    mimeType: "application/json",
-  },
-  "/api/category-tree": {
-    accepts: [{ scheme: "exact", price: "$0.04", network: NETWORK, payTo: WALLET_ADDRESS }],
-    description: "Get child categories for a parent FRED category. Walk the category tree.",
-    mimeType: "application/json",
+export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const route = ROUTES[pathname];
+  if (!route) return NextResponse.next();
+
+  // Check for payment header (x402 v2)
+  const paymentHeader = request.headers.get("Payment") || request.headers.get("X-Payment");
+
+  if (paymentHeader) {
+    // Verify payment with facilitator
+    try {
+      const amountInBaseUnits = Math.round(parseFloat(route.price) * 1_000_000).toString();
+      const requirements = {
+        scheme: "exact",
+        network: NETWORK,
+        asset: USDC_ASSET,
+        maxAmountRequired: amountInBaseUnits,
+        resource: `${BASE_URL}${pathname}`,
+        description: route.description,
+        mimeType: "application/json",
+        payTo: PAYEE,
+        maxTimeoutSeconds: 60,
+      };
+      const verifyResp = await fetch(`${FACILITATOR_URL}/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentPayload: paymentHeader, paymentRequirements: requirements }),
+      });
+      if (verifyResp.ok) {
+        const result = await verifyResp.json();
+        if (result.isValid) {
+          // Settle in background
+          fetch(`${FACILITATOR_URL}/settle`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentPayload: paymentHeader, paymentRequirements: requirements }),
+          }).catch(() => {});
+          return NextResponse.next();
+        }
+      }
+    } catch {
+      // fall through to 402
+    }
   }
-},
-  server
-);
 
+  // No valid payment — return 402 with x402 v2 body
+  const amountInBaseUnits = Math.round(parseFloat(route.price) * 1_000_000).toString();
+  const host = BASE_URL.replace(/^https?:\/\//, "");
 
-export default _proxy;
+  const x402v2Body = {
+    x402Version: 2,
+    accepts: [{
+      scheme: "exact",
+      network: NETWORK,
+      asset: USDC_ASSET,
+      maxAmountRequired: amountInBaseUnits,
+      resource: `${BASE_URL}${pathname}`,
+      description: route.description,
+      mimeType: "application/json",
+      payTo: PAYEE,
+      maxTimeoutSeconds: 60,
+    }],
+    paymentProtocol: "x402",
+  };
+
+  return new NextResponse(JSON.stringify(x402v2Body), {
+    status: 402,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Payment-Required": amountInBaseUnits,
+      "X-Payment-Network": NETWORK,
+      "X-Payment-Asset": USDC_ASSET,
+      "X-Payment-PayTo": PAYEE,
+      "X-Payment-Resource": `${BASE_URL}${pathname}`,
+      "WWW-Authenticate": `x402 realm="${host}", version="2", network="${NETWORK}", asset="${USDC_ASSET}", payee="${PAYEE}", amount="${amountInBaseUnits}", resource="${pathname}"`,
+    },
+  });
+}
+
 export const config = { matcher: ["/api/:path*"] };
