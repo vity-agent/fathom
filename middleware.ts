@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-const BASE_URL = process.env.BASE_URL || "https://fathom.vercel.app";
+// BASE_URL derived from request in handler
 const PAYEE = process.env.PAY_TO_ADDRESS || "0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86";
 const NETWORK = process.env.NETWORK || "eip155:8453";
 const FACILITATOR_URL = process.env.FACILITATOR_URL || "https://facilitator.payai.network";
@@ -38,6 +38,7 @@ const ROUTES: Record<string, { price: string; description: string }> = {
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const BASE_URL = request.nextUrl.origin;
   const route = ROUTES[pathname];
   if (!route) return NextResponse.next();
 
