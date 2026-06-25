@@ -1,5 +1,5 @@
 // Fathom — Custom x402 middleware
-// Returns 402 with x402 v2 JSON body for all paid routes
+// Returns 402 with x402 v2 JSON body + PAYMENT-REQUIRED header for all paid routes
 // Wallet: 0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86
 
 import { NextRequest, NextResponse } from "next/server";
@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
   if (!route) return NextResponse.next();
 
   // Check for payment header (x402 v2)
-  const paymentHeader = request.headers.get("Payment") || request.headers.get("X-Payment");
+  const paymentHeader = request.headers.get("Payment") || request.headers.get("X-Payment") || request.headers.get("payment-signature");
 
   if (paymentHeader) {
     // Verify payment with facilitator
@@ -82,11 +82,12 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // No valid payment — return 402 with x402 v2 body
+  // No valid payment — return 402 with x402 v2 body + PAYMENT-REQUIRED header
   const amountInBaseUnits = Math.round(parseFloat(route.price) * 1_000_000).toString();
   const host = BASE_URL.replace(/^https?:\/\//, "");
 
-  const x402v2Body = {
+  // Build payment requirements for PAYMENT-REQUIRED header (base64-encoded)
+  const paymentRequired = {
     x402Version: 2,
     accepts: [{
       scheme: "exact",
@@ -99,13 +100,27 @@ export async function middleware(request: NextRequest) {
       payTo: PAYEE,
       maxTimeoutSeconds: 60,
     }],
+    resource: {
+      url: `${BASE_URL}${pathname}`,
+      description: route.description,
+      mimeType: "application/json",
+    },
+  };
+
+  const x402v2Body = {
+    x402Version: 2,
+    accepts: paymentRequired.accepts,
     paymentProtocol: "x402",
   };
+
+  // Base64-encode for PAYMENT-REQUIRED header
+  const encodedPaymentRequired = Buffer.from(JSON.stringify(paymentRequired)).toString("base64");
 
   return new NextResponse(JSON.stringify(x402v2Body), {
     status: 402,
     headers: {
       "Content-Type": "application/json",
+      "PAYMENT-REQUIRED": encodedPaymentRequired,
       "X-Payment-Required": amountInBaseUnits,
       "X-Payment-Network": NETWORK,
       "X-Payment-Asset": USDC_ASSET,

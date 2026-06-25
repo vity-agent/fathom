@@ -9,12 +9,12 @@
       "email": "admin@orbonomy.xyz"
     },
     "x-logo": {
-      "url": "https://fathom.vercel.app/favicon.png"
+      "url": "https://fathom-opal.vercel.app/favicon.png"
     }
   },
   "servers": [
     {
-      "url": "https://fathom.vercel.app"
+      "url": "https://fathom-opal.vercel.app"
     }
   ],
   "paths": {
