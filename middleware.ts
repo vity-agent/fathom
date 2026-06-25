@@ -129,7 +129,7 @@ export async function middleware(request: NextRequest) {
       "X-Payment-Asset": USDC_ASSET,
       "X-Payment-PayTo": PAYEE,
       "X-Payment-Resource": `${BASE_URL}${pathname}`,
-      "WWW-Authenticate": `x402 realm="${host}", version="2", network="${NETWORK}", asset="${USDC_ASSET}", payee="${PAYEE}", amount="${amountInBaseUnits}", resource="${pathname}"`,
+      "WWW-Authenticate": `Payment realm="${host}", version="2", network="${NETWORK}", asset="${USDC_ASSET}", payee="${PAYEE}", amount="${amountInBaseUnits}", resource="${pathname}"`,
     },
   });
 }
