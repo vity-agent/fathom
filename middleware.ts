@@ -94,12 +94,14 @@ export async function middleware(request: NextRequest) {
     scheme: "exact",
     network: NETWORK,
     asset: USDC_ASSET,
+    currency: USDC_ASSET,
     amount: amountInBaseUnits,
     maxAmountRequired: amountInBaseUnits,
     resource: `${BASE_URL}${pathname}`,
     description: route.description,
     mimeType: "application/json",
     payTo: PAYEE,
+    recipient: PAYEE,
     maxTimeoutSeconds: 60,
   };
   const requestB64 = base64url(Buffer.from(JSON.stringify(requestPayload)));
