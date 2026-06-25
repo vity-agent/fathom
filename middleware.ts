@@ -15,7 +15,7 @@ const facilitatorClient = new HTTPFacilitatorClient({ url: FACILITATOR_URL });
 const server = new x402ResourceServer(facilitatorClient);
 server.register(NETWORK, new ExactEvmScheme());
 
-export const proxy = paymentProxy(
+const _proxy = paymentProxy(
 {
   "/api/observations": {
     accepts: [{ scheme: "exact", price: "$0.06", network: NETWORK, payTo: WALLET_ADDRESS }],
@@ -136,4 +136,6 @@ export const proxy = paymentProxy(
   server
 );
 
+
+export default _proxy;
 export const config = { matcher: ["/api/:path*"] };
