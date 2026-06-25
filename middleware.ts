@@ -3,7 +3,7 @@
 // Wallet: 0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86
 
 import { NextRequest, NextResponse } from "next/server";
-import { randomBytes, createHmac } from "crypto";
+
 
 const PAYEE = process.env.PAY_TO_ADDRESS || "0x0570cf2c24b14602c0c35f1d85192f6f0a12ed86";
 const NETWORK = process.env.NETWORK || "eip155:8453";
@@ -106,7 +106,11 @@ export async function middleware(request: NextRequest) {
 
   // HMAC-SHA256 binding: id = HMAC(secret, method|intent|realm|request|expires)
   const bindingInput = `x402|charge|${host}|${requestB64}|${expires}`;
-  const challengeId = createHmac("sha256", CHALLENGE_SECRET).update(bindingInput).digest("hex").slice(0, 24);
+  // HMAC-SHA256 using Web Crypto API (Vercel edge compatible)
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", enc.encode(CHALLENGE_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(bindingInput));
+  const challengeId = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 24);
 
   // IETF Payment challenge in WWW-Authenticate
   const wwwAuthenticate = `Payment id="${challengeId}", realm="${host}", method="x402", intent="charge", expires="${expires}", request="${requestB64}"`;
