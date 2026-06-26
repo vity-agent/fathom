@@ -21,14 +21,14 @@ const INDICATORS = [
 ];
 
 const ENDPOINTS = [
-  { path: "/api/snapshot", price: "$0.20", desc: "Dashboard — 10 key indicators", tag: "INTEL" },
-  { path: "/api/compare", price: "$0.15", desc: "Compare 2-5 series side by side", tag: "INTEL" },
-  { path: "/api/bulk", price: "$0.15", desc: "Multi-series fetch in one call", tag: "DATA" },
-  { path: "/api/observations", price: "$0.06", desc: "Data values for any Series", tag: "DATA" },
-  { path: "/api/search", price: "$0.06", desc: "Search 816K+ economic series", tag: "FIND" },
-  { path: "/api/calendar", price: "$0.08", desc: "Economic release calendar", tag: "DATA" },
-  { path: "/api/series", price: "$0.06", desc: "Series metadata", tag: "META" },
-  { path: "/api/popular", price: "$0.04", desc: "Top 20 watched indicators", tag: "FIND" },
+  { path: "/api/snapshot", price: "$0.40", desc: "Dashboard — 10 key indicators", tag: "INTEL" },
+  { path: "/api/compare", price: "$0.35", desc: "Compare 2-5 series side by side", tag: "INTEL" },
+  { path: "/api/bulk", price: "$0.35", desc: "Multi-series fetch in one call", tag: "DATA" },
+  { path: "/api/observations", price: "$0.40", desc: "Data values for any Series", tag: "DATA" },
+  { path: "/api/search", price: "$0.40", desc: "Search 816K+ economic series", tag: "FIND" },
+  { path: "/api/calendar", price: "$0.25", desc: "Economic release calendar", tag: "DATA" },
+  { path: "/api/series", price: "$0.40", desc: "Series metadata", tag: "META" },
+  { path: "/api/popular", price: "$0.35", desc: "Top 20 watched indicators", tag: "FIND" },
 ];
 
 export default function Home() {
@@ -65,7 +65,7 @@ export default function Home() {
           816,000+ Federal Reserve economic time series. GDP, inflation, employment, rates. x402 — pay per request.
         </p>
         <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-          {[["816K+", "Time Series"], ["23", "Endpoints"], ["$0.04", "Per Request"], ["120", "Req / Min"]].map(([v, l], i) => (
+          {[["816K+", "Time Series"], ["23", "Endpoints"], ["$0.35", "Per Request"], ["120", "Req / Min"]].map(([v, l], i) => (
             <div key={i} style={{ background: C.surface, border: "1px solid " + C.border, borderRadius: 12, padding: "1.25rem 1.75rem" }}>
               <div style={{ fontSize: "2rem", fontWeight: 800, color: C.accent }}>{v}</div>
               <div style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", color: C.muted, marginTop: 4 }}>{l}</div>
